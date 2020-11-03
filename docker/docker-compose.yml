@@ -1,0 +1,122 @@
+version: '3.7'
+
+services:
+  db:
+    image: mdillon/postgis
+    container_name: miniweather_db
+    volumes:
+      - miniweather_postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    expose:
+      - 5432
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+  api:
+    container_name: miniweather_backend
+    build:
+      context: ./..
+      dockerfile: docker/Dockerfile
+    command: /code/run_api.sh
+    environment:
+      - PYTHONPATH=/code/miniweather
+      - BASE_URL=https://meather.ir/
+      - MEDIA_URL=https://meather.ir/media/
+      - DEBUG_VALUE=TRUE
+      - DB_NAME=postgres
+    volumes:
+      - storage:/storage
+      - media:/code/miniweather/media/
+    ports:
+      - target: 8100
+        published: 8200
+        protocol: tcp
+        mode: ingress
+    depends_on:
+      - db
+      - redis
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  celery_beat:
+    container_name: miniweather_celery_beat
+    build:
+      context: ./..
+      dockerfile: docker/Dockerfile
+    command: /code/run_celery_beat.sh
+    environment:
+      - PYTHONPATH=/code/miniweather
+      - BASE_URL=https://meather.ir/
+      - MEDIA_URL=https://meather.ir/media/
+      - DEBUG_VALUE=FALSE
+      - DB_NAME=postgres
+    volumes:
+      - storage:/storage
+      - media:/code/miniweather/media/
+    depends_on:
+      - db
+      - redis
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  celery_worker:
+    container_name: miniweather_celery_worker
+    build:
+      context: ./..
+      dockerfile: docker/Dockerfile
+    command: /code/run_celery_worker.sh
+    environment:
+      - PYTHONPATH=/code/miniweather
+      - BASE_URL=https://meather.ir/
+      - MEDIA_URL=https://meather.ir/media/
+      - DEBUG_VALUE=FALSE
+      - DB_NAME=postgres
+    volumes:
+      - storage:/storage
+      - media:/code/miniweather/media/
+    depends_on:
+      - db
+      - redis
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  redis:
+    container_name: miniweather_redis
+    image: redis:5.0.6
+    command: redis-server
+    volumes:
+      - redis:/data
+    expose:
+      - 6379
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+volumes:
+  miniweather_postgres_data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/opt/miniweather/data'
+  redis:
+  media:
+  storage:
