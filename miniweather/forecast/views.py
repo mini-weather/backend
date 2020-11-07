@@ -58,13 +58,14 @@ class CurrentWeatherView(APIView):
                         'name': city_name
                     }
             city = City.find(query)
+
             if not city or query is None:
                 return Response({
                                 "message": "Location not found."
                                 },
                                 status.HTTP_404_NOT_FOUND)
             from_date = datetime.datetime.utcnow()
-            from_date -= datetime.timedelta(hours=1)
+            from_date -= datetime.timedelta(hours=3)
             current = Current.get(
                 city,
                 from_date
