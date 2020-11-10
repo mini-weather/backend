@@ -1,5 +1,5 @@
 # Pull base image
-FROM python:3.7-slim
+FROM python:3.9-slim
 
 # Set environment varibles
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -10,7 +10,7 @@ RUN export LC_ALL=C
 RUN mkdir -p /usr/share/nginx/html/
 RUN rm -rf /usr/share/nginx/html/*
 RUN rm -rf /etc/nginx/sites-enabled/*
-
+RUN pip install uwsgi
 # Set work directory
 WORKDIR /code
 # Install dependencies

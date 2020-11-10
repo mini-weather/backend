@@ -18,16 +18,16 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-REDIS_HOST = os.environ.get('REDIS_HOST', 'redis')
-REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
+REDIS_HOST = os.environ.get('MREDIS_HOST', 'redis')
+REDIS_PORT = os.environ.get('MREDIS_PORT', '6379')
 
 BASE_URL = os.environ['BASE_URL']
 
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
-DB_HOST = os.environ.get('DB_HOST', 'db')
-DB_NAME = os.environ.get('DB_NAME', 'miniweather')
-DB_PORT = int(os.environ.get('DB_PORT', '5432'))
+DB_HOST = os.environ.get('MDB_HOST', 'db')
+DB_NAME = os.environ.get('MDB_NAME', 'miniweather')
+DB_PORT = int(os.environ.get('MDB_PORT', '5432'))
 DB_ENGINE = os.environ.get(
     'DB_ENGINE',
     'django.contrib.gis.db.backends.postgis'
