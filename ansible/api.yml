@@ -38,6 +38,8 @@
       volumes:
       - /opt/data/media:/code/miniweather/media
       - /opt/data/api:/storage
+      - /opt/data/ip_data:/code/miniweather/data
+      - /opt/data/geo_data:/code/miniweather/geo/data
       ports:
       - "8080:8100"
       env:
