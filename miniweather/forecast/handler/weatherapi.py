@@ -5,11 +5,11 @@ BASE_URL = 'https://api.weatherapi.com/v1'
 
 class WeatherApi:
     
-    def get_realtime(city):
+    def get_realtime(query):
         url =  '%s/current.json?key=%s&q=%s' % (
             BASE_URL,
             settings.WEATHER_API_TOKEN,
-            city
+            query
         )
         result = requests.get(url)
         try:
@@ -17,11 +17,11 @@ class WeatherApi:
         except Exception as e:
             return None
 
-    def get_forecast(city, days=10):
+    def get_forecast(query, days=10):
         url =  '%s/forecast.json?key=%s&q=%s&days=%d' % (
             BASE_URL,
             settings.WEATHER_API_TOKEN,
-            city,
+            query,
             days
         )
         result = requests.get(url)

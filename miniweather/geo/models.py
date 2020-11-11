@@ -82,12 +82,26 @@ class City(models.Model):
     )
     province = models.ForeignKey(
         Province,
-        on_delete=models.CASCADE,
-        related_name='city'
+        on_delete=models.SET_NULL,
+        related_name='city',
+        null=True,
+        blank=True
     )
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def add(cls, data):
+        obj = City()
+        if 'name' in data:
+            obj.name = data['name'].lower()
+        if 'time_zone' in data:
+            obj.time_zone = data['time_zone']
+        if 'province' in data:
+            obj.province = data['province']
+        obj.save()
+        return obj
 
     @classmethod
     def get_list(cls, data):
@@ -103,6 +117,8 @@ class City(models.Model):
 
     @classmethod
     def find(cls, data):
+        if not data:
+            return None
         query = {}
         if 'id' in data:
             return City.objects.filter(id=data['id']).first()
@@ -110,7 +126,7 @@ class City(models.Model):
             query['area__contains'] = data['point']
         else:
             if 'name' in data:
-                query['name'] = data['name']
+                query['name__iexact'] = data['name']
             if 'province_id' in data:
                 query['province_id'] = data['province_id']
         city = City.objects.filter(**query).first()

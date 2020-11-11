@@ -8,13 +8,39 @@ from forecast.models import (
 from geo.models import City
 import datetime
 import pytz
+from django.core.cache import cache
+from django.conf import settings
 
 
-def update_weather_info(city):
-    result = WeatherApi.get_forecast('%f,%f' % (
-            city.center.y, city.center.x
+def update_weather_info(city=None, ip=None):
+    result = None
+    if city is not None:
+        result = WeatherApi.get_forecast('%f,%f' % (
+                city.center.y, city.center.x
+            )
         )
-    )
+    elif ip is not None:
+        result = WeatherApi.get_forecast(ip)
+
+    if not result:
+        return
+
+    if city is None:
+        city = City.find({
+            'name': result['location']['name'].lower()
+        })
+        cache.set("location_ip:%s" % (
+                ip
+            ),
+            result['location']['name'].lower(),
+            timeout=settings.IP2LOCATION_TTL
+        )
+        if not city:
+            city = City.add({
+                'name': result['location']['name']
+            })
+            
+
     time_zone = result['location']['tz_id']
     local_tz = pytz.timezone(time_zone)
     if time_zone:

@@ -35,7 +35,6 @@ class CurrentWeatherView(APIView):
         )
         if serializer.is_valid():
             query = None
-
             if 'lat' in serializer.validated_data and\
                'long' in serializer.validated_data:
                 point = Point(
@@ -52,12 +51,16 @@ class CurrentWeatherView(APIView):
                     'id': serializer.validated_data['city_id']
                 }
             else:
-                city_name = get_city_from_ip(request.headers['X-Real-Ip'])
+                city_name = get_city_from_ip('167.86.81.36')
                 if city_name:
                     query = {
                         'name': city_name
                     }
+
             city = City.find(query)
+
+            if not city:
+                update_weather_info(ip='167.86.81.36')
 
             if not city or query is None:
                 return Response({
@@ -75,7 +78,7 @@ class CurrentWeatherView(APIView):
                 date=from_date,
             )
             if not current:
-                update_weather_info(city)
+                update_weather_info(city=city)
                 current = Current.get(
                     city,
                     from_date
