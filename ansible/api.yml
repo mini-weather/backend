@@ -9,7 +9,7 @@
       exposed_ports:
       - "6379"
       volumes:
-      - /opt/data/redis:/data
+      - /opt/data/miniweather/redis:/data
 
   - name: Run database container
     docker_container:
@@ -19,7 +19,7 @@
       exposed_ports:
       - "5432"
       volumes:
-      - /opt/data/db:/var/lib/postgresql/data/
+      - /opt/data/miniweather/db:/var/lib/postgresql/data/
       env:
         POSTGRESQL_USER: 'postgres'
         POSTGRESQL_DATABASE: 'postgres'
@@ -30,16 +30,17 @@
       name: 'miniweather_api'
       image: thesinner/miniweather_backend:{{ lookup('env', 'CI_COMMIT_TAG') }}
       state: 'started'
+      pull: yes
       command: '/code/run_api.sh release'
       restart: yes
       links:
       - "miniweather_redis:redis"
       - "miniweather_db:db"
       volumes:
-      - /opt/data/media:/code/miniweather/media
-      - /opt/data/api:/storage
-      - /opt/data/ip_data:/code/miniweather/data
-      - /opt/data/geo_data:/code/miniweather/geo/data
+      - /opt/data/miniweather/media:/code/miniweather/media
+      - /opt/data/miniweather/api:/storage
+      - /opt/data/miniweather/ip_data:/code/miniweather/data
+      - /opt/data/miniweather/geo_data:/code/miniweather/geo/data
       ports:
       - "8080:8100"
       env:
@@ -48,6 +49,8 @@
         MEDIA_URL: 'https://meather.ir/media/'
         DEBUG_VALUE: 'FALSE'
         MDB_NAME: 'postgres'
+        SECRET_KEY:  "{{lookup('env', 'SECRET_KEY')}}"
+        WEATHER_API_TOKEN:  "{{lookup('env', 'WEATHER_API_TOKEN')}}"
     ignore_errors: no
 
   - name: Run Web

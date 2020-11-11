@@ -282,3 +282,4 @@ keys
 *.bin
 
 ansible/hosts
+env.sh

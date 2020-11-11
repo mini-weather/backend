@@ -205,6 +205,27 @@ MEDIA_ROOT = (
     MEDIAROOT
 )
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
+
 WEATHER_API_TOKEN = os.environ.get('WEATHER_API_TOKEN', 'TOKEN')
 
 IP2LOCATION_TTL = 3000
