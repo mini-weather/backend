@@ -13,6 +13,7 @@ Django==3.1.1
 django-import-export==2.3.0
 django-leaflet==0.27.1
 django-oauth-toolkit==1.3.2
+django-redis==4.12.1
 django-rest-framework-social-oauth2==1.1.0
 djangorestframework==3.11.1
 django-colorfield==0.3.2
