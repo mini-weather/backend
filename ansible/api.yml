@@ -48,6 +48,17 @@
         MDB_NAME: 'postgres'
     ignore_errors: no
 
+  - name: Run Web
+    docker_container:
+      name: 'miniweather_web'
+      image: thesinner/miniweather_web:{{ lookup('env', 'CI_COMMIT_TAG') }}
+      state: 'started'
+      command: ''
+      restart: yes
+      ports:
+      - "8081:80"
+    ignore_errors: no
+
   - name: "Check if Api is running"
     docker_container:
       name: "api"
