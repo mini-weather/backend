@@ -51,7 +51,7 @@ class CurrentWeatherView(APIView):
                     'id': serializer.validated_data['city_id']
                 }
             else:
-                city_name = get_city_from_ip('167.86.81.36')
+                city_name = get_city_from_ip(request.headers['X-Real-Ip'])
                 if city_name:
                     query = {
                         'name': city_name
@@ -60,7 +60,7 @@ class CurrentWeatherView(APIView):
             city = City.find(query)
 
             if not city:
-                update_weather_info(ip='167.86.81.36')
+                update_weather_info(ip=request.headers['X-Real-Ip'])
 
             if not city or query is None:
                 return Response({
